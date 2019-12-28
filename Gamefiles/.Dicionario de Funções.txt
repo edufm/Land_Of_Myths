@@ -1,0 +1,158 @@
+Dicionario de funções e classes:
+
+
+0 - Variaveis constantes
+
+	- img = Imagem do Tile
+	- imgPl = Imagem do Tile com Player
+	- imgE = Imagem do Tile com Monstro
+	- Window = Janela principal do jogo
+
+1 - Classe Main = Executavel do jogo
+
+	- Main = não possui atributo relevante
+		
+		- Start_Game() = inicializa itens basicos do jogo
+			- inicializa window
+			- inicializa player
+			- inicializa mapa
+			- inicializa matriz
+			- inicializa gui
+
+
+2 - Classe Mapa = Classe que monitora o mapa o gui e a matriz
+
+	- Mapa = Objeto responsavel pelo mapa
+		- Matriz = matriz do jogo (15 X 15)
+		- b = matriz de todos os botões (15X15)
+		- gadjets = lista dos itens do gui
+		- Waves = monitora a wave atual do jogo
+		- LEnemys = lista de inimigos (objetos) ativos no jogo
+
+		- detect_click(self, m, pl, img, imgPl, imgE) = Função acionada no click do botão, "Alma do jogo"
+			- self = objeto Map
+			- m = cordenadas do botão apertado
+			- pl = objeto player
+
+			- Verifica onde o click do player foi feito
+			- Se o click foi feito nos arredores do player, faz o movimento de andar
+			- Se o click foi feito em um inimigo executa a função "Enemy.Take_Damage"
+			- Se o click n for em nenhum dos dois passa a jogada
+			- Verifica se ainda existem inimigos, se não existirem, muda a Wave para += 1 e executa a função "Enemys.cria_inimigos"
+			- Faz a jogada do AI chamando a função "Mapa.Aiturn"
+			- Faz o update do gui pela função "Mapa.updategui"
+
+		- Aiturn(LEnemys, pl, Map, img, imgE)
+			- LEnemys = lista de inimigos
+
+			- Para cada inimigo na lista executa a jogada do inimigo pela função "Enemys.jogada"
+
+		- load_map(self, window, pl, Map, img, imgPl, imgE)
+			- Cria todos os botões do mapa já em posição
+			- Define localização e imagem do player no meio da matriz
+
+		- gui(window, Map)
+			- cria todos os itens do gui que não o Mapa
+			- Adiciona todos os itens do Gui a lista Map.gadjets
+
+		- updategui(gadjets, vida, ammo, wave)
+			- Arualiza todos os itens do gui com a Wave e munição e vida do player.
+
+3 - Classe Gun = Arquivo das armas
+
+	- Gun = Classe que cria os objetos arma do jogo
+		- ID = numero da arma
+		- Ammo = Munição da arma
+		- Range = Alcance da arma
+		- Damage = Dano da arma
+		
+		-Check_Range(self ,loc, pl)
+			- Checa a distancia de um objeto até o player
+			
+		-Pick_Weapon(ID, pl)
+			- adiciona munição ao jogador
+			
+		-Weapon_Swap(ID,pl)
+			- Altera a arma equipada pelo jogador
+		
+		-Shotgun_Shot(pl, loc, Map)
+			- testa a direção do tiro da Doze e chama a função correspondente
+			
+		- Up_Pistol(self,pl) ;  Up_Shotgun(self,pl) ;  Up_Sniper(self,pl)
+			- aumenta o dano da arma correspondente
+			- retira todo a munição atual da arma correspondente
+		
+		- Shotgun_Left(loc,Map,pl) ; Shotgun_Right(loc,Map,pl) ; Shotgun_Up(loc,Map,pl) ; Shotgun_Down(loc,Map,pl)
+			- chama a função de ataque da shotgun para os quadrados correspondentes
+			
+		- Sniper_X(loc,Map,pl,Damage,First,count)
+			- Usa Recursividade e ageita todo o dano da Sniper, reduzindo 1 de dano sempre que passa por um inimigo
+		
+		- Gerar_Guns(Map)
+			- gera aleatoriamente armas no mapa e contem um limite de armas que podem existir ao mesmo tempo no mapa
+			
+		- Gerar_Pistol(Map) ; Gerar_Shotgun(Map) ; Gerar_Sniper(Map)
+			- Muda a imagem do botao correspondente para a arma correspondente
+			- Gera o ID da arma na matriz
+			- Contem um teste para não gerar uma arma em cima de outro objeto do mapa
+			
+		- Take_Damage_P(loc, pl, Map) ; Take_Damage_SG(loc, pl, Map, Damage) ; Take_Damage_SN(loc, pl, Map, Damage,count,Ammo)
+			(correspondem a Pistol, Shotgun e Sniper, respectivamente)
+			- Cuida de checar qual dos inimigos no mapa esta sendo atingido e alterar a vida do mesmo.
+			
+		- Ammo_Count(pl)
+			- Retorna 1 e diminue o vaor da munição caso o jogador tenha munição para atacar
+
+4 - Classe Player = Arquivo responsavel pelo player
+
+	- Player = Classe que cria o Player no jogo
+		- Health = vida do player
+		- Weapon = objeto da classe arma equipado pelo player
+		- pos = posição [X,Y] do player
+
+		- set_player(self)
+			- define a posição inicial do player
+
+5 - Classe Enemys = Classe responsavel pela AI, Spawn de inimigos e combate do jogo
+
+	- Enemys = Classe responsavel pelos objetos de inimigos no jogo
+		- ID = numero do inimigo
+		- health = Vida do inimigo
+		- Damage = Dano do inimigo
+		- pos = posição do inimigo
+
+		- cria_inimigos(waves, Map, imgE)
+			- utiliza o dado da wave para gerar inimigos
+			- aiciona os inimigos gerados à matriz
+			- Adiciona a imagem de inimigos aos botões
+			- Adiciona os objetos à lista LEnemys
+
+		- Take_Damage(loc, pl, Map, img)
+			- loc = Click do player nos botões enviado pela classe Mapa
+
+			- passa iten por iten da lista LEnemys, e vê qual inimigo está em qual posição
+			- após encontrar qual subtrai da vida deste o dano da arma do player
+			- se a vida do inimigo for <= 0, elimina o inimigo do jogo, da matriz e da lista Lenemys
+
+		- left(self)
+			- Move o inimigo para esquerda
+
+		- right(self)
+			- Move o inimigo para direita
+
+		- up(self)
+			- Move o inimigo para cima
+
+		- down(self)
+			- Move o inimigo para baixo
+
+		- jogada(self, pl, Map, img, imgE)
+			- Verifica a que distancia o inimigo está do player
+			- Se a distancia X ou Y for 0 e a outra for 1 realiza um ataque ao player "Enemys.Atack"
+			- Anda na direção da maior distancia (X ou Y)
+			- Se forem iguais escolhe aleatoriamente (X ou Y)
+			- Se já houver um inimigo na posição escolhida ignora a jogada
+			- Automaticamente atualiza a Matriz e os botões
+
+		- atack(self, pl)
+			- reduz a vida do player dependendo do dano do inimigo
